@@ -232,6 +232,61 @@ For example, with two rules on `ChanA`
 * `ChanB`: user can send text message to `ChanA`
 * `ChanC`: user can sent text message to `ChanA`
 
+##### `sub` Example 3
+
+Given the channel tree
+
+```text
+ChanA
+  ChanB
+    ChanC
+      ChanD
+        ChanE
+    ChanX
+    ChanY
+    ChanZ
+```
+
+To apply to 
+
+The parameter `a` can be used for sibling channels and channels of the same depth level.
+
+* a `@~sub,0` on `ChanB` 
+* a `@~sub,0` on `ChanB` 
+
+* a `@~sub,0,1` rule on `ChanB` that is inherited to its children applies to `ChanC`, `ChanD`, `ChanE`
+* a `@~sub,0,1,1` rule on `ChanB` that is inherited to its children applies to `ChanC`
+* a `@sub,0,1,1` rule on `ChanB` that is inherited to its children applies to `ChanC`, `ChanD`, `ChanE`
+
+* a `@~sub,0` rule on `ChanB` that is inherited to its children applies to `ChanC`, `ChanD`, `ChanE`
+* a `@~sub,1,1` rule on `ChanB` applies to `ChanD` only
+* a `@~sub,2,1` rule on `ChanB` applies to `ChanE` only
+* a `@~sub,0,2` rule on `ChanB` applies to `ChanC` and `ChanD`
+* a `@~sub,0,3` rule on `ChanB` applies to `ChanC` and `ChanD`
+* a `@sub,0,1` rule on `ChanB` that is inherited to children applies to `ChanC`, `ChanD`, `ChanE`
+* a `@sub,1,1` rule on `ChanB` that is inherited to children applies to `ChanD`, `ChanE`
+
+```text
+ChanA
+  ChanB
+    ChanC
+```
+
+A `@sub` rule (equivalent to `@sub,0,1`) on `ChanA` applies to users in `ChanB` and `ChanC` but gives permission on `ChanA`.
+
+For example, if *Text message* is *denied* on `ChanA`, but a `@sub` rule on `ChanA` allows *Text message*, a user in `ChanB` or `ChanC` can send text messages to `ChanA`. A user in `ChanA` can not send a text message to `ChanA`.
+
+For example, with two rules on `ChanA`
+
+* `ChanA`: `@all` *Deny* *Text message*
+* `ChanA`: `@sub` *Allow* *Text message*
+
+=>
+
+* `ChanA`: user can not send text message to `ChanA`
+* `ChanB`: user can send text message to `ChanA`
+* `ChanC`: user can sent text message to `ChanA`
+
 ### Evaluation Locality
 
 Given the channel tree
@@ -265,6 +320,24 @@ If `ChanB` has `@all` *deny* *text message* and `@~in` *allow* *text message* th
 ## Linking Channels
 
 Linked channels share communication. Connecting channels and then restricting which users can do what in which channels is a versatile approach for configuring complex permission behavior.
+
+### Link + `sub` Example
+
+Given the channel tree
+
+```text
+Common
+  Team 1
+  Team 2
+```
+
+we isolate `Team 1` and `Team 2` from one another while not isolating `Common`.
+
+Link `Common` to `Team 1` and `Team 2` by joining `Common` and then using the context menu (right-click) on the other two channels to link them. Now users from all three channels can hear each other.
+
+On `Common` define `@~sub,0,1` with *Deny Speak* and context *Applies to sub-channels* (without *Applies to this channel*).
+
+On `Common` define `@in` with *Allow Speak*.
 
 ## Testing with multiple clients
 
